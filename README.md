@@ -64,3 +64,18 @@ $ nix why-depends -f wrapper.nix pythonous-shell /nix/store/f87w21b91cws0wbsvyfn
         => /nix/store/f87w21b91cws0wbsvyfn5vnlyv491czi-python3-3.8.3
 
 ```
+
+
+## Where it the python now?
+
+Let's see where the python is in a better-shell:
+
+```console
+$ nix-shell better-shell.nix --run "which python"
+which: no python in (/nix/store/x4gd806afbgx0ag1jf8y7blzrrhiyx8q-bash-interactive-4.4-p23/bin:...)
+
+```
+
+It looks the python is gone...
+
+See you, python.
