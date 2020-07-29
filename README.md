@@ -21,39 +21,47 @@ $ nix-shell --run "which python"
 ```
 
 
-Then re-write the `shell.nix` using `buildEnv` instead of `mkShell`.
+Then re-write the `shell.nix` in terms of `buildEnv` instead of `mkShell`.
 
-Naming `better-shell.nix`:
-
-```nix
-pkgs.buildEnv {
-  name = "pythonous-env";
-  paths = with pkgs; [
-    # ...
-  ];
-}
-```
-
-The important difference between them is that:
+The important difference between `mkShell` and `buildEnv` is that:
 - `mkShell` cannot be built nor be named
 - `buildEnv` can be built and be named
 
-To move your `mkShell` to `buildEnv`:
-- add `name` attribute
-- replace `buildInputs` with `paths`
 
+From now on, we will work under the `better-shell` directory.
+First, let's move build input packages from `shell.nix` to `default.nix` and make it a derivation for a *env* where depending packages are loaded.
 
-And write a wrapper to make the env an attribute so that we can refer to it by the attribute path:
+Since we want to use `default.nix` as our custom version of `<nixpkgs>`, make the env an overlay.
 
-`wrapper.nix`
+`default.nix` have something like:
+
 ```nix
-{ 
-  pythonous-shell = import ./better-shell.nix {};
+pythonousEnvOverlay = self: super: {
+  pythonous-env = super.buildEnv {
+    name = "pythonous-env";
+    paths = with pkgs; [
+      # ...
+    ];
+  };
+};
+```
+
+Then load it in the `shell.nix`:
+
+```nix
+{ pkgs ? import ./. {}
+}:
+
+pkgs.mkShell {
+  buildInputs = [ pkgs.pythonous-env ];
 }
 ```
 
+Note that `import ./. {}` loads `default.nix` which contains the `pythonous-env` we defined.
 
-Now, you are ready to hit `why-depends` and see where the python comes from:
+Now packages are packed in the `pythonous-env` and we can inspect it by name.
+
+Hit `why-depends` and see where the python comes from:
 
 ```console
 $ nix why-depends -f wrapper.nix pythonous-shell /nix/store/f87w21b91cws0wbsvyfn5vnlyv491czi-python3-3.8.3/bin/python
@@ -71,19 +79,19 @@ $ nix why-depends -f wrapper.nix pythonous-shell /nix/store/f87w21b91cws0wbsvyfn
 Let's see where the python is in a better-shell:
 
 ```console
-$ nix-shell better-shell.nix --run "which python"
+$ nix-shell --run "which python"
 which: no python in (/nix/store/x4gd806afbgx0ag1jf8y7blzrrhiyx8q-bash-interactive-4.4-p23/bin:...)
 
 ```
 
-It looks the python is gone...
+Well, the python looks already gone...
 
 See you, python.
 
 
 ## Tips
 
-You can also enumerate packages which depends on the python as:
+You can also enumerate depending packages on the python as:
 
 ```console
 $ nix-store -q --referrers $(which python)
@@ -100,4 +108,4 @@ $ nix-store -q --referrers $(which python)
 ...
 ```
 
-Although it tends to be a big list, it may help.
+Although it tends to be a big list, it may help if you have some idea.
