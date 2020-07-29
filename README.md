@@ -79,3 +79,25 @@ which: no python in (/nix/store/x4gd806afbgx0ag1jf8y7blzrrhiyx8q-bash-interactiv
 It looks the python is gone...
 
 See you, python.
+
+
+## Tips
+
+You can also enumerate packages which depends on the python as:
+
+```console
+$ nix-store -q --referrers $(which python)
+/nix/store/f87w21b91cws0wbsvyfn5vnlyv491czi-python3-3.8.3
+/nix/store/mn2klp7l3kn0lfd8f0scb0yc7svmgjyk-python3.8-six-1.15.0
+/nix/store/rz9xfa9m4p97v3vwp82alkp5jfh8g7y9-python3.8-idna-2.9
+/nix/store/yb06nkcvl6qp6xcw77q1ar46b09mz6q7-python3.8-pycparser-2.20
+/nix/store/51jszsalapss28mpjfyd9dj9ghz676q8-python3.8-cffi-1.14.0-dev
+/nix/store/ckcgnq2k8p2pb40pfx0x4qnzwsr0b14y-python3.8-pyparsing-2.4.6
+/nix/store/h9k9l3crdnvg31g911rdh3232l899y9g-python3.8-packaging-20.4
+/nix/store/ybcckqgi75y5pir3dim23wbvk4al00rq-python3.8-cryptography-2.9.2-dev
+/nix/store/ynqy5k0lqixqiqshm2id2yl1gwlcs72f-python3.8-pyasn1-0.4.8
+/nix/store/3w3sbhamhq7cbbl8hw7p5wqr9g9pdy1q-python3.8-pyOpenSSL-19.1.0-dev
+...
+```
+
+Although it tends to be a big list, it may help.
